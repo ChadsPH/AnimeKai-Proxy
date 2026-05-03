@@ -145,6 +145,8 @@ function proxyPlaylistContent(content, url, headersParam) {
             return line.replace(/(URI\s*=\s*")([^"]+)(")/gi, (match, prefix, uri, suffix) => {
                 try {
                     const abs = new URL(uri, url.href).href;
+                    // ✅ Skip if already proxied
+                    if (abs.includes('/m3u8-proxy?url=')) return match;
                     return `${prefix}${generateProxyUrl(abs, headersParam)}${suffix}`;
                 } catch (e) {
                     return match;
@@ -154,6 +156,8 @@ function proxyPlaylistContent(content, url, headersParam) {
 
         try {
             const abs = new URL(trimmed, url.href).href;
+            // Skip if already proxied
+            if (abs.includes('/m3u8-proxy?url=')) return line;
             return generateProxyUrl(abs, headersParam);
         } catch (e) {
             return line;
